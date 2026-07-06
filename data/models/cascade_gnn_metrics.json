@@ -1,0 +1,21 @@
+{
+  "period": "midday",
+  "architecture": "graphsage",
+  "nodes": 1992,
+  "train_nodes": 1494,
+  "test_nodes": 498,
+  "features": 9,
+  "hidden": 32,
+  "epochs": 400,
+  "target": "total_failure_p (Monte Carlo, direct + cascade)",
+  "gnn_test": {
+    "mae": 0.0157,
+    "r2": 0.9928
+  },
+  "baseline_direct_fragility_test": {
+    "mae": 0.2218,
+    "r2": -0.5587
+  },
+  "note": "Production surrogate: graphsage. Trained on Monte Carlo cascade labels; baseline uses direct fragility only (no cascade).",
+  "model_path": "C:\\Users\\islam\\OneDrive\\Desktop\\earthquake\\data\\models\\cascade_gnn.pt"
+}

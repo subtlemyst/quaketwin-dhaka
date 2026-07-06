@@ -1,0 +1,187 @@
+{
+  "phase": 5,
+  "summary": {
+    "scenario_id": "dhaka_mw72_dauki",
+    "period": "midday",
+    "monte_carlo_iterations": 300,
+    "graph": {
+      "nodes": 2479,
+      "edges": 9737,
+      "node_types": {
+        "power": 61,
+        "comm_tower": 8,
+        "bridge": 1195,
+        "hospital": 728,
+        "zone": 487
+      },
+      "edge_services": {
+        "grid": 160,
+        "power": 1710,
+        "comm": 1702,
+        "access": 6165
+      }
+    },
+    "mean_failure_by_type": {
+      "bridge": {
+        "direct_failure_p": 0.0685,
+        "total_failure_p": 0.0684,
+        "cascade_failure_p": 0.0
+      },
+      "comm_tower": {
+        "direct_failure_p": 0.127,
+        "total_failure_p": 0.7658,
+        "cascade_failure_p": 0.6362
+      },
+      "hospital": {
+        "direct_failure_p": 0.0853,
+        "total_failure_p": 0.6035,
+        "cascade_failure_p": 0.5184
+      },
+      "power": {
+        "direct_failure_p": 0.1385,
+        "total_failure_p": 0.5997,
+        "cascade_failure_p": 0.462
+      }
+    },
+    "cascade_amplification": {
+      "power": 4.331,
+      "comm_tower": 6.031,
+      "bridge": 0.998,
+      "hospital": 7.072
+    },
+    "population_weighted": {
+      "p_power_lost": 0.6704,
+      "p_comm_lost": 0.6798,
+      "p_bridge_out": 0.652,
+      "expected_delay_factor": 1.9015
+    },
+    "worst_zones": [
+      {
+        "zone_id": "zone_9047_2370",
+        "population": 13807,
+        "casualties": 1082,
+        "p_power_lost": 0.7133,
+        "p_comm_lost": 0.73,
+        "p_bridge_out": 0.98,
+        "expected_delay_factor": 2.1063
+      },
+      {
+        "zone_id": "zone_9048_2371",
+        "population": 14771,
+        "casualties": 1073,
+        "p_power_lost": 0.7133,
+        "p_comm_lost": 0.73,
+        "p_bridge_out": 0.96,
+        "expected_delay_factor": 2.0963
+      },
+      {
+        "zone_id": "zone_9045_2369",
+        "population": 31889,
+        "casualties": 2913,
+        "p_power_lost": 0.7267,
+        "p_comm_lost": 0.73,
+        "p_bridge_out": 0.9333,
+        "expected_delay_factor": 2.0863
+      },
+      {
+        "zone_id": "zone_9040_2384",
+        "population": 24,
+        "casualties": 2,
+        "p_power_lost": 0.7233,
+        "p_comm_lost": 0.7133,
+        "p_bridge_out": 0.95,
+        "expected_delay_factor": 2.0838
+      },
+      {
+        "zone_id": "zone_9044_2383",
+        "population": 1240,
+        "casualties": 38,
+        "p_power_lost": 0.6433,
+        "p_comm_lost": 0.7133,
+        "p_bridge_out": 0.99,
+        "expected_delay_factor": 2.0838
+      },
+      {
+        "zone_id": "zone_9039_2375",
+        "population": 47027,
+        "casualties": 3117,
+        "p_power_lost": 0.7333,
+        "p_comm_lost": 0.68,
+        "p_bridge_out": 0.98,
+        "expected_delay_factor": 2.0813
+      },
+      {
+        "zone_id": "zone_9045_2370",
+        "population": 38079,
+        "casualties": 3404,
+        "p_power_lost": 0.7267,
+        "p_comm_lost": 0.73,
+        "p_bridge_out": 0.9233,
+        "expected_delay_factor": 2.0813
+      },
+      {
+        "zone_id": "zone_9044_2371",
+        "population": 12175,
+        "casualties": 1012,
+        "p_power_lost": 0.7267,
+        "p_comm_lost": 0.73,
+        "p_bridge_out": 0.92,
+        "expected_delay_factor": 2.0797
+      },
+      {
+        "zone_id": "zone_9047_2371",
+        "population": 18826,
+        "casualties": 1518,
+        "p_power_lost": 0.7133,
+        "p_comm_lost": 0.73,
+        "p_bridge_out": 0.9267,
+        "expected_delay_factor": 2.0797
+      },
+      {
+        "zone_id": "zone_9038_2376",
+        "population": 11626,
+        "casualties": 985,
+        "p_power_lost": 0.69,
+        "p_comm_lost": 0.6867,
+        "p_bridge_out": 0.9867,
+        "expected_delay_factor": 2.0778
+      }
+    ],
+    "outputs": {
+      "nodes": "C:\\Users\\islam\\OneDrive\\Desktop\\earthquake\\data\\processed\\cascade_nodes_dhaka_mw72_dauki.gpkg",
+      "zones": "C:\\Users\\islam\\OneDrive\\Desktop\\earthquake\\data\\processed\\cascade_zones_dhaka_mw72_dauki.gpkg"
+    }
+  },
+  "gnn_metrics": {
+    "period": "midday",
+    "architecture": "graphsage",
+    "nodes": 1992,
+    "train_nodes": 1494,
+    "test_nodes": 498,
+    "features": 9,
+    "hidden": 32,
+    "epochs": 400,
+    "target": "total_failure_p (Monte Carlo, direct + cascade)",
+    "gnn_test": {
+      "mae": 0.0157,
+      "r2": 0.9928
+    },
+    "baseline_direct_fragility_test": {
+      "mae": 0.2218,
+      "r2": -0.5587
+    },
+    "note": "Production surrogate: graphsage. Trained on Monte Carlo cascade labels; baseline uses direct fragility only (no cascade).",
+    "model_path": "C:\\Users\\islam\\OneDrive\\Desktop\\earthquake\\data\\models\\cascade_gnn.pt"
+  },
+  "tables": [
+    "outputs\\phase5\\tables\\T9_1_failure_by_node_type.csv",
+    "outputs\\phase5\\tables\\T9_2_worst_zones_rescue_delay.csv",
+    "outputs\\phase5\\tables\\T9_3_gnn_surrogate_metrics.csv"
+  ],
+  "figures": [
+    "outputs\\phase5\\figures\\F9_1_cascade_amplification.png",
+    "outputs\\phase5\\figures\\F9_2_rescue_delay_map.png",
+    "outputs\\phase5\\figures\\F9_3_service_loss_vs_population.png",
+    "outputs\\phase5\\figures\\F9_4_gnn_vs_montecarlo.png"
+  ]
+}

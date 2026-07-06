@@ -1,0 +1,71 @@
+{
+  "reference_scenario": {
+    "id": "dhaka_mw72_dauki",
+    "distance_km": 157.6,
+    "pga_g": 0.1599,
+    "mmi": 8.07,
+    "pga_spread_g": 0.0383,
+    "amplified_pga_mean": 0.2243,
+    "amplified_pga_std": 0.012
+  },
+  "shakemap_style_distance_envelopes": [
+    {
+      "distance_km": 100,
+      "mw": 7.2,
+      "pga_g_range": [
+        0.08,
+        0.2
+      ],
+      "source": "GSHAP South Asia envelope",
+      "model_pga_g": 0.2596,
+      "model_mmi": 8.5,
+      "within_envelope": false
+    },
+    {
+      "distance_km": 150,
+      "mw": 7.2,
+      "pga_g_range": [
+        0.06,
+        0.18
+      ],
+      "source": "CDMP Dhaka scenario class",
+      "model_pga_g": 0.1685,
+      "model_mmi": 8.12,
+      "within_envelope": true
+    },
+    {
+      "distance_km": 200,
+      "mw": 7.2,
+      "pga_g_range": [
+        0.04,
+        0.12
+      ],
+      "source": "Regional attenuation synthesis",
+      "model_pga_g": 0.124,
+      "model_mmi": 7.85,
+      "within_envelope": false
+    }
+  ],
+  "historical_analog_replays": [
+    {
+      "event_id": "assam_1897_analog",
+      "name": "1897 Great Assam earthquake (analog)",
+      "distance_km": 250.1,
+      "model_mmi": 8.3,
+      "literature_mmi_dhaka": 7.0,
+      "literature_mmi_range": [
+        6.5,
+        7.5
+      ],
+      "mmi_within_range": false,
+      "model_pga_g": 0.207,
+      "reference": "Oldham (1899); Ambraseys & Douglas (2004) intensity catalog",
+      "note": "Historical intensity replay uses the same GMPE logic-tree; not a full damage validation \u2014 compares order-of-magnitude shaking only."
+    }
+  ],
+  "limitations": [
+    "No USGS ShakeMap raster available for Bangladesh reference events in open pipeline.",
+    "Hospital disruption and utility outage validation require DGHS/DPDC operational data.",
+    "Building damage validation requires post-event survey or remote-sensing labels."
+  ]
+}

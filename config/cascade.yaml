@@ -1,0 +1,52 @@
+# Phase 5 — infrastructure cascade model assumptions
+#
+# Node types:
+#   power_substation / power_plant / power_generator — electric supply
+#   comm_tower — mobile communication
+#   bridge — road access chokepoints
+#   hospital — emergency care (from Phase 4 layer)
+#   zone — aggregated building demand cells (~1.1 km)
+
+zone_cell_deg: 0.01          # aggregation cell size for building zones (~1.1 km)
+
+# Seismic fragility of infrastructure nodes: logistic on amplified PGA (g).
+# P(direct failure) = 1 / (1 + exp(-k * (pga - median)))  + liquefaction boost
+seismic_fragility:
+  logistic_k: 12.0
+  liquefaction_boost_max: 0.15     # added prob at liquefaction_index = 1
+  median_capacity_g:
+    power_substation: 0.35
+    power_plant: 0.45
+    power_generator: 0.45
+    comm_tower: 0.40
+    bridge: 0.50
+    hospital: 0.45
+
+# Dependency wiring (k nearest providers per dependent)
+dependencies:
+  zone_substations: 2        # zone draws power from 2 nearest substations
+  zone_towers: 2             # zone communicates via 2 nearest towers
+  zone_bridges_within_km: 1.5  # bridge counts as access dependency if this close
+  hospital_substations: 1
+  hospital_towers: 1
+  tower_substations: 1
+  substation_neighbors: 2    # grid interconnection between substations
+
+# Conditional (cascade) failure probabilities when ALL providers of a
+# service are down. Backup generators etc. are folded in here.
+propagation:
+  substation_to_substation: 0.30   # load redistribution overload
+  substation_to_tower: 0.65        # towers: short battery, few generators
+  substation_to_hospital: 0.30     # hospitals: ~70% assumed working backup
+  max_iterations: 6
+
+# Monte Carlo settings
+monte_carlo:
+  iterations: 500
+  seed: 42
+
+# Rescue-delay coupling back to Phase 4
+rescue_delay:
+  comm_loss_factor: 0.60      # +60% response time if zone communication lost
+  power_loss_factor: 0.25     # +25% if zone power lost (signals, lighting)
+  bridge_out_factor: 0.50     # +50% if a nearby bridge is out

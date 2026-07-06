@@ -1,0 +1,114 @@
+{
+  "phase": 4,
+  "summary": {
+    "period": "midday",
+    "buildings": 706115,
+    "hospitals": 728,
+    "total_expected_casualties": 322837,
+    "mean_response_time_min": 7.19,
+    "network_routed_pct": 5.9,
+    "overloaded_hospitals": 243,
+    "max_overload_ratio": 38.402,
+    "top_buildings": [
+      {
+        "building_id": 304935722,
+        "collapse_probability": 0.2237,
+        "pop_midday": 12219,
+        "casualties_midday": 267,
+        "hospital_name": "Radda HmSfp centre",
+        "response_time_min": 3.26,
+        "rescue_priority_score": 0.7408
+      },
+      {
+        "building_id": 96797010,
+        "collapse_probability": 0.3727,
+        "pop_midday": 2088,
+        "casualties_midday": 195,
+        "hospital_name": "Azimpur Maternity Hospital, Azimpur Rd, Dhaka",
+        "response_time_min": 2.15,
+        "rescue_priority_score": 0.619
+      },
+      {
+        "building_id": 499445072,
+        "collapse_probability": 0.6178,
+        "pop_midday": 1359,
+        "casualties_midday": 185,
+        "hospital_name": "National Veterinary Hospital, Bangabazar Chakkar, Dhaka",
+        "response_time_min": 3.34,
+        "rescue_priority_score": 0.6188
+      },
+      {
+        "building_id": 1086465066,
+        "collapse_probability": 0.432,
+        "pop_midday": 1603,
+        "casualties_midday": 152,
+        "hospital_name": "National Veterinary Hospital, Bangabazar Chakkar, Dhaka",
+        "response_time_min": 1.37,
+        "rescue_priority_score": 0.5659
+      },
+      {
+        "building_id": 1084050122,
+        "collapse_probability": 0.4184,
+        "pop_midday": 1839,
+        "casualties_midday": 169,
+        "hospital_name": "Unnamed facility",
+        "response_time_min": 3.15,
+        "rescue_priority_score": 0.5427
+      },
+      {
+        "building_id": 24448713,
+        "collapse_probability": 0.2499,
+        "pop_midday": 5181,
+        "casualties_midday": 151,
+        "hospital_name": "Platinum Hospital Limited, Panthapath, Dhaka",
+        "response_time_min": 2.53,
+        "rescue_priority_score": 0.4769
+      },
+      {
+        "building_id": 1510263424,
+        "collapse_probability": 0.3675,
+        "pop_midday": 1176,
+        "casualties_midday": 95,
+        "hospital_name": "Bangladesh Bank Medical Center",
+        "response_time_min": 1.07,
+        "rescue_priority_score": 0.445
+      },
+      {
+        "building_id": 502558507,
+        "collapse_probability": 0.4447,
+        "pop_midday": 1193,
+        "casualties_midday": 117,
+        "hospital_name": "\u09b8\u09ae\u09cd\u09ae\u09bf\u09b2\u09bf\u09a4 \u09b8\u09be\u09ae\u09b0\u09bf\u0995 \u09b9\u09be\u09b8\u09aa\u09be\u09a4\u09be\u09b2",
+        "response_time_min": 2.3,
+        "rescue_priority_score": 0.439
+      },
+      {
+        "building_id": 263804515,
+        "collapse_probability": 0.4063,
+        "pop_midday": 991,
+        "casualties_midday": 81,
+        "hospital_name": "\u099c\u09be\u09a4\u09c0\u09df \u099a\u0995\u09cd\u09b7\u09c1\u09ac\u09bf\u099c\u09cd\u099e\u09be\u09a8 \u0987\u09a8\u09bf\u09b8\u09cd\u099f\u09bf\u099f\u09bf\u0989\u099f \u098f\u09ac\u0982 \u09b9\u09be\u09b8\u09aa\u09be\u09a4\u09be\u09b2",
+        "response_time_min": 0.58,
+        "rescue_priority_score": 0.4285
+      },
+      {
+        "building_id": 234138423,
+        "collapse_probability": 0.4219,
+        "pop_midday": 1159,
+        "casualties_midday": 108,
+        "hospital_name": "Suborna Phermacy",
+        "response_time_min": 1.88,
+        "rescue_priority_score": 0.4271
+      }
+    ]
+  },
+  "tables": [
+    "outputs\\phase4\\tables\\T8_1_hospital_overload.csv",
+    "outputs\\phase4\\tables\\T8_2_top_rescue_priority_buildings.csv"
+  ],
+  "figures": [
+    "outputs\\phase4\\figures\\F8_1_hospital_overload.png",
+    "outputs\\phase4\\figures\\F8_2_rescue_priority_map.png",
+    "outputs\\phase4\\figures\\F8_3_response_time_histogram.png"
+  ]
+}

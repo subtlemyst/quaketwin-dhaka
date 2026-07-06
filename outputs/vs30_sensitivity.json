@@ -1,0 +1,12 @@
+{
+  "perturb_pct": 0.2,
+  "vs30_range_observed": [
+    180.0,
+    375.0
+  ],
+  "mean_collapse_baseline": 0.3974,
+  "mean_collapse_vs30_low": 0.4314,
+  "mean_collapse_vs30_high": 0.3721,
+  "max_pct_change": 8.58,
+  "n_buildings_sampled": 100000
+}

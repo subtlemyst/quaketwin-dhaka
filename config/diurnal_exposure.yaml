@@ -1,0 +1,87 @@
+# Phase 3 — diurnal population exposure multipliers
+# Applied to WorldPop-derived population_est by occupancy_type.
+# Baseline population_est ≈ static residential-weighted density (WorldPop 2020).
+
+diurnal_periods:
+  midnight:
+    label: "00:00 — residential night"
+    hour: 0
+  morning_commute:
+    label: "08:00 — commute & schools"
+    hour: 8
+  midday:
+    label: "13:00 — offices & schools"
+    hour: 13
+  evening:
+    label: "18:00 — traffic & commercial"
+    hour: 18
+
+# Multiplier on population_est by occupancy_type and period.
+# These are RELATIVE weights: the pipeline renormalizes each period so the
+# citywide total equals the static WorldPop baseline (population conservation).
+# Values are thesis scaffold — calibrate with BBS / mobile data if available.
+occupancy_multipliers:
+  residential:
+    midnight: 1.25
+    morning_commute: 0.55
+    midday: 0.50
+    evening: 0.85
+  commercial:
+    midnight: 0.05
+    morning_commute: 0.90
+    midday: 1.40
+    evening: 1.25
+  education:
+    midnight: 0.02
+    morning_commute: 1.30
+    midday: 1.50
+    evening: 0.20
+  industrial:
+    midnight: 0.08
+    morning_commute: 0.85
+    midday: 1.20
+    evening: 0.70
+  healthcare:
+    midnight: 0.60
+    morning_commute: 0.90
+    midday: 1.00
+    evening: 0.95
+  assembly:
+    midnight: 0.05
+    morning_commute: 0.40
+    midday: 0.70
+    evening: 1.35
+  storage:
+    midnight: 0.10
+    morning_commute: 0.50
+    midday: 0.80
+    evening: 0.40
+
+casualty_model:
+  description: >
+    HAZUS-inspired severity-stratified affected-person rates by occupancy.
+    Partial band uses collapse probability 0.35-0.65; severe band uses p >= 0.65.
+  severity_rates:
+    residential:
+      partial: 0.22
+      severe: 0.38
+    commercial:
+      partial: 0.18
+      severe: 0.32
+    education:
+      partial: 0.25
+      severe: 0.42
+    industrial:
+      partial: 0.15
+      severe: 0.28
+    healthcare:
+      partial: 0.20
+      severe: 0.35
+    assembly:
+      partial: 0.28
+      severe: 0.45
+    storage:
+      partial: 0.08
+      severe: 0.15
+  # Legacy flat rate kept for backward-compatible summaries only
+  collapse_casualty_rate: 0.35

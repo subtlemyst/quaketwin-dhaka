@@ -1,0 +1,17 @@
+# GMPE logic-tree (Phase 1 upgrade)
+# Weighted mean of median PGA models; spread reported as hazard uncertainty.
+
+logic_tree:
+  - id: boore_calibrated
+    weight: 0.55
+    description: "Calibrated Boore-style relation for Dhaka far-field Mw 7 class"
+    intercept: -2.5
+    mw_coeff: 0.85
+    ln_r2_coeff: 0.55
+
+  - id: atkinson_boore_2006
+    weight: 0.45
+    description: "Atkinson-Boore 2006 crustal (scaled for eastern Bangladesh)"
+    intercept: -2.35
+    mw_coeff: 0.82
+    ln_r2_coeff: 0.52

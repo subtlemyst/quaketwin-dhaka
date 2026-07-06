@@ -1,0 +1,26 @@
+{
+  "period": "midday",
+  "training": "cross_scenario",
+  "train_scenarios": [
+    "dhaka_mw68_dauki",
+    "dhaka_mw70_dauki",
+    "dhaka_mw72_dauki",
+    "dhaka_mw75_dauki"
+  ],
+  "test_scenarios": [
+    "dhaka_mw65_madhupur",
+    "dhaka_mw70_madhupur"
+  ],
+  "nodes_per_scenario": 1992,
+  "features": 12,
+  "gnn_test_held_out_scenarios": {
+    "mae": 0.0779,
+    "r2": 0.8834
+  },
+  "baseline_direct_fragility_test": {
+    "mae": 0.1173,
+    "r2": 0.3048
+  },
+  "note": "Test set comprises all nodes from held-out Madhupur scenarios.",
+  "model_path": "C:\\Users\\islam\\OneDrive\\Desktop\\earthquake\\data\\models\\cascade_gnn_ensemble.pt"
+}

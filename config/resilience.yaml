@@ -1,0 +1,13 @@
+# QuakeTwin Resilience Index (composite metric, Phase 6-lite)
+
+weights:
+  structural: 0.30       # 1 - mean collapse probability
+  emergency_capacity: 0.25  # 1 - normalized hospital overload
+  lifeline_robustness: 0.25  # 1 - cascade delay factor (inverted)
+  accessibility: 0.20   # inverse normalized response time
+
+tiers:
+  low: [0, 40]
+  moderate: [40, 55]
+  high: [55, 70]
+  very_high: [70, 100]

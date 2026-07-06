@@ -1,0 +1,125 @@
+# QuakeTwin Dhaka — study area and default scenario (Phase 0–1)
+# Coordinates: WGS84 (EPSG:4326)
+
+study_area:
+  name: "Greater Dhaka Metropolitan Area"
+  crs: "EPSG:4326"
+  bbox:
+    west: 90.32
+    south: 23.68
+    east: 90.52
+    north: 23.95
+  center:
+    lon: 90.4125
+    lat: 23.815
+
+# Hazard grid resolution (degrees); ~500 m at Dhaka latitude
+hazard_grid:
+  cell_size_deg: 0.0045
+  output_crs: "EPSG:4326"
+
+faults:
+  dauki:
+    name: "Dauki Fault Zone"
+    description: "Eastern Bangladesh thrust; primary thesis scenario fault"
+    reference_epicenter:
+      lon: 91.85
+      lat: 24.35
+    typical_depth_km: 15.0
+    max_magnitude: 7.5
+
+  madhupur:
+    name: "Madhupur Fault"
+    description: "Western margin scenario (sensitivity analysis)"
+    reference_epicenter:
+      lon: 90.55
+      lat: 24.10
+    typical_depth_km: 12.0
+    max_magnitude: 7.0
+
+# Default thesis scenario: Mw 7.2, Dauki Fault
+default_scenario:
+  id: "dhaka_mw72_dauki"
+  magnitude: 7.2
+  magnitude_type: "Mw"
+  fault: "dauki"
+  epicenter:
+    lon: 91.85
+    lat: 24.35
+  depth_km: 15.0
+  mechanism: "reverse"
+  time_of_day: "13:00"
+  season: "monsoon"
+  notes: >
+    Baseline scenario for Phase 1 hazard maps. Epicenter placed on the
+    Dauki Fault trace per regional seismotectonic literature; validate
+    against your thesis literature review.
+
+soil_zones:
+  # Simplified geotechnical classes for Dhaka basin (replace with borehole data)
+  holocene_alluvium:
+    code: "HA"
+    amplification_factor: 1.8
+    liquefaction_susceptibility: 0.75
+    description: "Soft Holocene alluvium, central and eastern Dhaka"
+
+  pleistocene_terrace:
+    code: "PT"
+    amplification_factor: 1.3
+    liquefaction_susceptibility: 0.35
+    description: "Stiff Pleistocene terrace deposits"
+
+  marsh_organic:
+    code: "MO"
+    amplification_factor: 2.2
+    liquefaction_susceptibility: 0.90
+    description: "Marsh and organic-rich lowlands"
+
+  engineered_fill:
+    code: "EF"
+    amplification_factor: 1.5
+    liquefaction_susceptibility: 0.55
+    description: "Urban fill and reclaimed land"
+
+data_sources:
+  buildings:
+    - name: "OpenStreetMap building footprints"
+      url: "https://www.openstreetmap.org"
+      license: "ODbL"
+      status: "processed"
+    - name: "OpenBuildingMap / Microsoft building footprints"
+      url: "https://github.com/microsoft/GlobalMLBuildingFootprints"
+      license: "ODbL (when merged with OSM)"
+      status: "planned"
+
+  roads:
+    - name: "OpenStreetMap road network"
+      url: "https://download.geofabrik.de/asia/bangladesh.html"
+      license: "ODbL"
+      status: "planned"
+
+  hospitals:
+    - name: "OpenStreetMap amenities"
+      url: "https://www.openstreetmap.org"
+      license: "ODbL"
+      status: "planned"
+    - name: "DGHS Bangladesh health facilities"
+      url: "http://dghs.gov.bd"
+      license: "verify for thesis use"
+      status: "planned"
+
+  population:
+    - name: "WorldPop Bangladesh"
+      url: "https://www.worldpop.org"
+      license: "Creative Commons"
+      status: "downloaded"
+    - name: "Bangladesh Bureau of Statistics census"
+      url: "http://bbs.gov.bd"
+      license: "verify for thesis use"
+      status: "planned"
+
+  geotechnical:
+    - name: "Regional liquefaction studies (Dhaka basin)"
+      url: "literature"
+      license: "cite in thesis"
+      status: "planned"

@@ -1,0 +1,83 @@
+{
+  "method": "latin_hypercube",
+  "n_samples": 128,
+  "seed": 42,
+  "parameters": {
+    "w_boore": [
+      0.4,
+      0.6
+    ],
+    "capacity_shift_g": [
+      -0.03,
+      0.03
+    ],
+    "logistic_k_scale": [
+      0.85,
+      1.15
+    ],
+    "substation_to_substation": [
+      0.15,
+      0.45
+    ],
+    "substation_to_tower": [
+      0.5,
+      0.8
+    ],
+    "non_res_occ_scale": [
+      0.8,
+      1.2
+    ]
+  },
+  "metrics": {
+    "mean_collapse_p": {
+      "mean": 0.4052,
+      "std": 0.0409,
+      "ci95": [
+        0.3333,
+        0.4739
+      ],
+      "min": 0.3124,
+      "max": 0.4841
+    },
+    "midday_casualties": {
+      "mean": 317568.4922,
+      "std": 60798.333,
+      "ci95": [
+        192578.3,
+        405123.2
+      ],
+      "min": 157042.0,
+      "max": 419297.0
+    },
+    "hospital_overload_ratio": {
+      "mean": 0.1435,
+      "std": 0.0275,
+      "ci95": [
+        0.087,
+        0.1831
+      ],
+      "min": 0.071,
+      "max": 0.1895
+    },
+    "delay_factor": {
+      "mean": 1.9012,
+      "std": 0.1913,
+      "ci95": [
+        1.5984,
+        2.2164
+      ],
+      "min": 1.5793,
+      "max": 2.2569
+    },
+    "citywide_eri": {
+      "mean": 69.1259,
+      "std": 2.9919,
+      "ci95": [
+        63.941,
+        75.2365
+      ],
+      "min": 62.7638,
+      "max": 76.2683
+    }
+  }
+}

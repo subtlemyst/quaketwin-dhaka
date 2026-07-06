@@ -1,0 +1,36 @@
+{
+  "split": "75/25 node hold-out",
+  "nodes": 1992,
+  "results": [
+    {
+      "architecture": "gcn",
+      "mae": 0.0182,
+      "r2": 0.988
+    },
+    {
+      "architecture": "graphsage",
+      "mae": 0.0161,
+      "r2": 0.9923
+    },
+    {
+      "architecture": "gat",
+      "mae": 0.0176,
+      "r2": 0.9902
+    },
+    {
+      "architecture": "gin",
+      "mae": 0.0515,
+      "r2": 0.95
+    },
+    {
+      "architecture": "mlp",
+      "mae": 0.022,
+      "r2": 0.9763
+    },
+    {
+      "architecture": "direct_fragility",
+      "mae": 0.2218,
+      "r2": -0.5587
+    }
+  ]
+}

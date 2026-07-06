@@ -1,0 +1,26 @@
+# Scenario ensemble for cascade + cross-scenario GNN (Phase 5 upgrade)
+# Train GNN on train_scenarios; evaluate generalization on test_scenarios.
+
+train_scenarios:
+  - id: dhaka_mw68_dauki
+    fault: dauki
+    magnitude: 6.8
+  - id: dhaka_mw70_dauki
+    fault: dauki
+    magnitude: 7.0
+  - id: dhaka_mw72_dauki
+    fault: dauki
+    magnitude: 7.2
+  - id: dhaka_mw75_dauki
+    fault: dauki
+    magnitude: 7.5
+
+test_scenarios:
+  - id: dhaka_mw65_madhupur
+    fault: madhupur
+    magnitude: 6.5
+  - id: dhaka_mw70_madhupur
+    fault: madhupur
+    magnitude: 7.0
+
+monte_carlo_iterations: 300

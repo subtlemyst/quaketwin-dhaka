@@ -1,0 +1,816 @@
+\documentclass[a4paper,fleqn]{cas-sc}
+
+\usepackage[numbers,sort&compress]{natbib}
+\bibliographystyle{model1-num-names}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{xurl}
+\graphicspath{{figures/}}
+
+% Clickable, line-breakable repository URLs (hyperref loaded by cas-sc)
+\newcommand{\githubrepo}{\url{https://github.com/subtlemyst/quaketwin-dhaka}}
+
+% Declarations page: after Conclusion, before References
+\newcommand{\declarationspage}{%
+  \clearpage
+  \begingroup
+  \raggedright
+  \sloppy
+  \setlength{\parskip}{0.5\baselineskip}
+  \section*{Data Availability}
+  All input data are openly available: building footprints, road networks, health facilities, and lifeline infrastructure derive from OpenStreetMap (\copyright\ OpenStreetMap contributors, Open Database License) via the Geofabrik Bangladesh extract, and gridded population from the WorldPop 2020 constrained dataset (CC~BY~4.0). All derived layers (hazard grids, building risk profiles, diurnal exposure, response, and cascade outputs) are regenerated deterministically by the released pipeline.
+
+  \section*{Code Availability}
+  \phantomsection\label{sec:code_availability}
+  The full pipeline is publicly available: OSM extraction (\texttt{scripts/extract\_dhaka\_osm.py}), hazard and enrichment stages (\texttt{scripts/run\_hazard\_scenario.py}, \texttt{scripts/build\_building\_profiles.py}), diurnal exposure and response models (\texttt{scripts/run\_diurnal\_exposure.py}, \texttt{scripts/run\_response\_model.py}), cascade simulation and physics-informed surrogate emulator (\texttt{scripts/run\_cascade.py}, \texttt{scripts/train\_cascade\_gnn.py}), publication scripts, configuration files (\texttt{config/}), and a README with step-by-step reproduction instructions.\par\medskip
+  \noindent\textbf{GitHub}\par
+  \githubrepo
+
+  \section*{Ethics Statement}
+  This study used only openly licensed geospatial and gridded population data; no human-subject data were collected or processed at individual level. Casualty figures are model-based scenario estimates for planning purposes.
+
+  \section*{Declaration of Competing Interest}
+  The author declares no known competing financial interests or personal relationships that could have influenced the work reported in this paper.
+  \endgroup
+  \clearpage
+}
+
+% Inline figures (CAS redefines floats; avoid caption package conflicts)
+\makeatletter
+\newcommand{\casinlinefig}[4][\linewidth]{%
+  \par\vskip6pt
+  \refstepcounter{figure}%
+  {\sffamily\small\raggedleft
+   \includegraphics[width=#1]{#2}\par\vskip6pt
+   \textbf{\color{scolor}\figurename~\thefigure:}~#3\par}%
+  \label{#4}%
+  \par\vskip6pt
+}
+\makeatother
+
+% References: dedicated final page(s); standard \twocolumn back matter (CAS-safe)
+\makeatletter
+\renewcommand{\bibsection}{%
+  \clearpage
+  \twocolumn[{\section*{References}\vspace{0.25\baselineskip}}]%
+}
+\AtBeginDocument{%
+  \setlength{\bibsep}{0pt plus 0.2pt}%
+}
+\makeatother
+
+\begin{document}
+\let\WriteBookmarks\relax
+\def\printorcid{}
+
+\shorttitle{A Digital Twin of Earthquake Risk in Dhaka}
+\shortauthors{Chowdhury}
+
+\title[mode=title]{QuakeTwin: A Digital Twin of Earthquake Vulnerability,
+Dynamic Population Exposure, and Cascading Lifeline Failure in Dhaka,
+Bangladesh}
+
+\author[1]{Md. Rafiul Azam Chowdhury}
+\affiliation[1]{organization={Department of Computer Science and Engineering, United International University},
+            addressline={},
+            city={Dhaka},
+            postcode={1212},
+            country={Bangladesh}}
+
+\begin{abstract}
+Dhaka, one of the world's densest megacities, sits within 160~km of the Dauki
+Fault, yet building-resolved earthquake risk assessments that account for
+time-of-day population movement and interdependent lifeline failure remain
+scarce. This study presents \textbf{QuakeTwin, an open and reproducible
+digital twin of Greater Dhaka} that chains six coupled models: (i) a
+GMPE logic-tree ground-motion model with Vs30 site amplification for a
+moment magnitude ($M_w$)~7.2 Dauki scenario; (ii) fragility-based collapse
+probabilities for 706{,}115 OpenStreetMap building footprints enriched with
+WorldPop population under structural plausibility caps; (iii) a
+population-conserving diurnal exposure model with HAZUS
+severity-stratified casualties; (iv) an emergency-response model with
+network shortest-path routing to 728 mapped health facilities; (v) a
+300-iteration Monte Carlo cascade simulation over a 2{,}479-node lifeline
+dependency graph, extended to a six-scenario ensemble spanning Dauki and
+Madhupur faults; and (vi) a composite Earthquake Resilience Index (ERI)
+over 487 building zones. Under the reference scenario, mean
+soil-amplified peak ground acceleration reaches 0.22~g (mean collapse
+probability 0.40), HAZUS-expected casualties at midday total 323{,}837, and
+243 of 728 hospitals (33\%) exceed emergency capacity. Cascading failures
+amplify lifeline loss far beyond direct seismic damage: substation failure
+probability rises from 0.14 to 0.60 (4.3$\times$) and hospital functional
+loss from 0.09 to 0.60 (7.1$\times$), with an expected rescue-delay factor
+of 1.90. A nearer Madhupur $M_w$~7.0 event produces near-total lifeline
+failure (100\% communication loss) and higher delay (2.34$\times$) despite
+lower magnitude. A \textbf{physics-informed graph surrogate emulator}
+trained on Monte Carlo cascade outputs generalizes across fault scenarios:
+cross-scenario evaluation on held-out Madhupur graphs yields
+$R^2 = 0.883$ (mean absolute error 0.078), versus $R^2 = 0.992$ on a
+single-scenario node hold-out. Citywide ERI is 70.9 (very-high tier).
+Outputs support \textbf{population-level preparedness planning and lifeline
+hardening prioritization}, not building-specific engineering assessment.
+The full pipeline is released as open source for data-scarce megacities.
+\end{abstract}
+
+\begin{keywords}
+digital twin \sep earthquake risk \sep surrogate emulator \sep cascading
+failure \sep dynamic exposure \sep Dhaka
+\end{keywords}
+
+{\hfuzz=120pt\maketitle}
+
+\section{Introduction}
+Dhaka concentrates more than 20~million people on Holocene floodplain
+sediments at the collision boundary of the Indian and Eurasian plates.
+Geodetic evidence indicates that the Indo-Burman subduction system east of
+the city has accumulated sufficient strain to host large earthquakes
+\cite{steckler2016}, and the Dauki Fault along the Shillong Plateau margin,
+approximately 150--200~km north-east of the capital, is considered capable
+of $M_w \geq 7$ events. Despite this, most published risk assessments for
+Dhaka stop at ward-level hazard or vulnerability indices
+\cite{cdmp2009,islam2020}: few resolve risk at the individual building, none
+propagate that risk through time-of-day population movement, and none
+quantify how interdependent lifeline systems --- electricity, communication,
+road access, and health care --- fail together rather than in isolation.
+
+These three gaps matter operationally. Building-level resolution determines
+where retrofitting budgets go; diurnal exposure determines when an
+earthquake of a given size is deadliest; and cascading lifeline failure
+determines whether the emergency-response system that survives the shaking
+can actually function. International experience is unambiguous on the last
+point: in the 2011 T\=ohoku and 2023 Kahramanmara\c{s} earthquakes,
+communication blackouts and hospital power loss degraded response far beyond
+what structural damage alone predicted \cite{ouyang2014}. A \textbf{digital
+twin} differs from a static geographic information system (GIS) overlay in
+four ways \cite{ford2020,hamilton2024udt}: it maintains a persistent,
+building-resolved representation of urban state; couples that state to
+physics-based and graph-based simulators; supports repeatable what-if
+scenario injection (magnitude, epicenter, retrofit); and is architected for
+periodic or event-driven updating when live feeds (seismic instruments,
+hospital occupancy, utility status) become available. QuakeTwin is therefore
+a \textit{synthetic} twin today --- fully reproducible from open archives ---
+with a surrogate layer that makes interactive exploration feasible before
+real-time instrumentation is deployed.
+
+This paper introduces \textbf{QuakeTwin}, a digital twin of Greater Dhaka
+that addresses all three gaps in a single reproducible pipeline built
+entirely from freely available data (OpenStreetMap \cite{osm2008}, WorldPop
+\cite{worldpop}, and regional seismic-hazard literature). The contributions
+are:
+\begin{enumerate}
+  \item a building-resolved risk layer for 706{,}115 footprints combining a
+        weighted GMPE logic-tree, Vs30 site amplification, liquefaction
+        susceptibility, and HAZUS-informed fragility curves \cite{hazus};
+  \item a population-conserving diurnal exposure model with HAZUS
+        severity-stratified casualties, redistributing rather than rescaling
+        the WorldPop nighttime population across occupancy classes by hour;
+  \item an emergency-response model with network shortest-path routing,
+        hospital-overload, and rescue-priority estimates for 728 mapped
+        health facilities;
+  \item a six-scenario Monte Carlo cascade ensemble over an explicit
+        lifeline dependency graph \cite{motter2002,ouyang2014}, quantifying
+        fault-proximity effects (Dauki vs.\ Madhupur) on system-level failure;
+  \item a \textbf{physics-informed surrogate emulator} --- implemented as
+        GraphSAGE \cite{hamilton2017} after architecture ablation --- that
+        accelerates Monte Carlo cascade simulation to millisecond latency
+        without replacing the physics pipeline; and
+  \item a composite Earthquake Resilience Index (ERI) integrating structural,
+        emergency-capacity, lifeline, and accessibility components at the
+        building-zone scale.
+\end{enumerate}
+
+\textbf{Epistemic caveat (read first).} The dominant uncertainty in this
+study is not model architecture but \textit{data incompleteness}: 95.4\% of
+building footprints lack OpenStreetMap construction tags and inherit a
+single ``unknown'' fragility class. All downstream exposure, response, and
+resilience metrics are conditional on this proxy layer and should be
+interpreted as planning-order-of-magnitude estimates, not engineering
+certificates for individual structures.
+
+Table~\ref{tab:positioning} positions this study against regional assessments,
+global hazard platforms, and digital-twin literature. QuakeTwin is
+complementary to engines such as OpenQuake \cite{pagani2014} and the GEM
+framework \cite{gem2023}: those systems excel at regional probabilistic
+seismic hazard and portfolio loss; this work adds building-resolved open-data
+stock, population-conserving diurnal exposure, network-routed response, and
+explicit lifeline cascade simulation with a learned surrogate at city scale.
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Positioning against representative platforms and Dhaka studies. Bldg.\ = building-level; Diurnal = time-of-day exposure; Cascade = interdependent lifeline failure; Surrogate = learned simulation emulator; Open = fully open data and code.}
+  \label{tab:positioning}
+  \small
+  \setlength{\tabcolsep}{2pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X*{5}{>{\centering\arraybackslash}p{0.09\linewidth}}@{}}
+    \toprule
+    Platform / study & Bldg. & Diurnal & Cascade & Surr. & Open \\
+    \midrule
+    CDMP \cite{cdmp2009} & No & No & No & No & No \\
+    Islam et al.\ \cite{islam2020} & No & No & No & No & Part. \\
+    HAZUS \cite{hazus} & Yes$^\dagger$ & No & No & No & No \\
+    OpenQuake \cite{pagani2014} & Port. & No & No & No & Yes \\
+    GEM \cite{gem2023} & Port. & No & No & No & Yes \\
+    SimCenter workflows \cite{simcenter2020} & Yes & No & Part. & No & Yes \\
+    ShakeMap \cite{wald2006} & No & No & No & No & Yes \\
+    Urban DT reviews \cite{hamilton2024udt} & --- & No & No & No & --- \\
+    \textbf{This study (QuakeTwin)} & \textbf{Yes} & \textbf{Yes} & \textbf{Yes} & \textbf{Yes} & \textbf{Yes} \\
+    \bottomrule
+  \end{tabularx}
+  \par\smallskip
+  {\footnotesize $^\dagger$Inventory-based, not OSM-resolved for Dhaka.}
+\end{table}
+
+Section~\ref{sec:method} formalizes the methodology and
+Section~\ref{sec:experiments} reports empirical results for the
+$M_w$~7.2 Dauki scenario.
+
+\section{Proposed Method}
+\label{sec:method}
+
+The pipeline chains six stages --- hazard, building vulnerability, diurnal
+exposure, emergency response, lifeline cascade with physics-informed surrogate
+emulator, and
+resilience indexing --- each consuming the previous stage's outputs and each
+independently re-runnable from configuration files.
+
+\subsection{Digital-Twin Architecture}
+\label{sec:architecture}
+QuakeTwin separates persistent \textit{state} (building and infrastructure
+graphs), \textit{simulation} (hazard, fragility, cascade Monte Carlo), and
+\textit{surrogate inference} (graph-based emulator). Figure~\ref{fig:dt_arch} shows the target
+Phase~6 architecture: live feeds (seismic sensors, hospital status, utility
+SCADA, OSM/WorldPop updates) refresh the state graph; the physics pipeline
+calibrates cascade parameters; the surrogate emulator enables millisecond what-if
+queries on the dashboard while full Monte Carlo runs remain available for
+validation. This is distinct from a one-off GIS overlay or static HAZUS
+portfolio run.
+
+\casinlinefig[0.72\linewidth]{dt_architecture.pdf}{QuakeTwin digital-twin architecture: live data feeds, physics simulation chain, physics-informed surrogate emulator, and dashboard API.}{fig:dt_arch}
+
+\subsection{Study Area and Data}
+The study area covers Greater Dhaka (90.32--90.53$^{\circ}$E,
+23.68--23.95$^{\circ}$N). All datasets are open (Table~\ref{tab:data}).
+Only eight communication towers are mapped in OpenStreetMap for the study
+area; communication-layer results are therefore indicative and flagged as a
+data limitation throughout (Section~\ref{sec:limitations}).
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Data sources.}
+  \label{tab:data}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.34\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.26\linewidth}@{}}
+    \toprule
+    Layer & Source & Count / resolution \\
+    \midrule
+    Building footprints & OpenStreetMap (Geofabrik) & 706{,}115 polygons \\
+    Road network & OpenStreetMap & highway-tagged ways \\
+    Hospitals and clinics & OpenStreetMap & 728 facilities \\
+    Power nodes & OpenStreetMap \texttt{power=*} & 61 \\
+    Communication towers & OpenStreetMap & 8 \\
+    Highway bridges & OpenStreetMap & 1{,}195 \\
+    Population & WorldPop 2020 constrained \cite{worldpop} & $\sim$100~m grid \\
+    Soil zones & Literature-informed proxy & 3 classes \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Scenario and Ground Motion}
+\label{sec:hazard}
+The reference scenario is a $M_w$~7.2 rupture on the Dauki Fault
+(epicentral distance to central Dhaka $\approx 158$~km, depth 15~km).
+Median bedrock peak ground acceleration (PGA) follows a compact
+distance-saturating attenuation of Boore--Atkinson form \cite{boore2008},
+\begin{equation}
+\ln \mathrm{PGA} = a + b\,M_w - c \ln\!\left(R^2 + h^2\right),
+\end{equation}
+implemented as a \textbf{weighted logic-tree} of two crustal GMPE branches
+(55\% calibrated Boore-style, 45\% Atkinson--Boore 2006 scaled for eastern
+Bangladesh). Weights were set by requiring the weighted-mean bedrock PGA at
+Dhaka ($\approx$158~km) to fall within the 0.06--0.25~g envelope of regional
+studies \cite{cdmp2009} while preserving the relative spread between branches;
+a one-at-a-time sensitivity over 40/60 and 60/40 splits changes mean
+amplified PGA by less than 4\% (Section~\ref{sec:sensitivity}); perturbing
+Vs30 by $\pm$20\% changes mean collapse probability by up to 8.6\%.
+Site response samples
+a USGS Vs30 mosaic \cite{borcherdt1994} (180--375~m/s over the study area,
+with Borcherdt-style short-period amplification $F_a = (V_{\mathrm{ref}}/V_{s30})^{m_a}$ where $m_a$ decreases with bedrock PGA), combined with three
+literature-informed soil-proxy zones (amplification factors 1.3--2.1).
+Liquefaction susceptibility on each grid cell follows a simplified
+Iwasaki-style index \cite{iwasaki1982,kramer1996}:
+\begin{equation}
+L = \min\!\left[1,\; S_{\mathrm{vs30}} \cdot f_{\mathrm{shake}}(\mathrm{PGA_{amp}}) \cdot g_{\mathrm{gw}}(\mathrm{zone}) \right],
+\end{equation}
+where $S_{\mathrm{vs30}}$ is base susceptibility from Vs30 class,
+$f_{\mathrm{shake}}$ ramps from 0.2 to 1.0 as PGA increases, and
+$g_{\mathrm{gw}}$ is a groundwater proxy elevated in marsh and Holocene
+zones. This index is a \textit{planning proxy} pending borehole calibration.
+PGA converts to Modified Mercalli intensity (MMI) via Worden et al.\
+\cite{worden2012}. Both prespecified validation checks pass: bedrock PGA
+(model mean 0.161~g) falls within the 0.06--0.25~g literature envelope, and
+mean MMI (8.08) within the 6.0--8.5 envelope for Greater Dhaka under a large
+eastern-fault event.
+
+\subsection{Building Vulnerability}
+\label{sec:buildings}
+Each footprint is enriched with construction type (normalized from OSM
+\texttt{building=*} tags), height (from \texttt{building:levels} or class
+defaults), occupancy class, nearest hazard-grid attributes, fault distance,
+and population. Population is the product of WorldPop density and effective
+footprint area, bounded by an effective-footprint cap
+(20{,}000~m\textsuperscript{2}) and a structural capacity cap of
+$\mathrm{floors} \times \mathrm{area} / 10$~m\textsuperscript{2} per person;
+these caps remove implausible single-building estimates (maximum 5{,}333
+occupants after capping) while changing the citywide total by only $-2.8\%$
+(final total 4.53~million).
+
+Collapse probability follows a HAZUS-informed logistic fragility
+\cite{hazus} on soil-amplified PGA,
+\begin{equation}
+P_{\mathrm{collapse}} = \min\!\left[1,\;
+\frac{1}{1+e^{-k (\mathrm{PGA_{amp}} - \theta_c)}} + 0.25\,L \right],
+\end{equation}
+where $\theta_c$ is the construction-class median capacity (reduced for
+taller buildings), $k$ the logistic slope, and $L \in [0,1]$ the
+liquefaction index (boost capped at 0.20). A gradient-boosting model
+trained on the same features is retained solely as a sensitivity analysis;
+all results below use the fragility model.
+
+\subsection{Population-Conserving Diurnal Exposure}
+\label{sec:diurnal}
+WorldPop is a nighttime residential surface. To estimate exposure at hour
+$t$, occupancy-class multipliers $m_{o,t}$ act as \textit{relative weights}
+and the citywide total is renormalized to the static baseline:
+\begin{equation}
+p_{i,t} = p_i \, m_{o(i),t} \cdot
+\frac{\sum_j p_j}{\sum_j p_j \, m_{o(j),t}},
+\end{equation}
+so that people move between buildings but never leave the study area.
+Expected casualties follow \textbf{HAZUS severity-stratified rates}
+\cite{hazus} applied to collapsed-building occupants by construction class,
+replacing the earlier flat 35\% injury-plus-fatality proxy. Occupancy
+multipliers by period and land-use class follow HAZUS-inspired diurnal
+patterns (residential dominance at night, commercial/education peaks at
+midday) and are documented as \textit{scenario weights} in the released
+configuration; perturbing non-residential multipliers by $\pm$20\% changes
+midday casualties by less than 1\% under population conservation
+(Section~\ref{sec:sensitivity}).
+
+\subsection{Emergency Response}
+\label{sec:response}
+Each building is assigned its nearest health facility. Where the OpenStreetMap
+road graph connects building and facility, travel time follows a
+\textbf{network shortest path} (Dijkstra on the largest connected component);
+otherwise a straight-line fallback is used. Only 5.9\% of buildings are
+network-routed in the current graph --- the routing module is included as a
+\textbf{proof-of-concept} for graph-complete OSM extraction, not as a
+citywide travel-time model. Emergency capacity is estimated from OSM amenity
+class (a known weakness; DGHS bed censuses would be the authoritative
+replacement). A response-time proxy combines road-class travel speed
+with local blockage delays that grow with the density of high-collapse-probability
+buildings within 25~m of the route. Rescue priority weights normalized expected
+casualties (0.65), collapse probability (0.20), and inverse response time (0.15).
+
+\subsection{Lifeline Dependency Graph and Cascade Simulation}
+\label{sec:cascade}
+The lifeline graph contains 2{,}479 nodes --- 61 power nodes, 8
+communication towers, 1{,}195 bridges, 728 hospitals, and 487 building
+zones ($\sim$1.1~km aggregation cells carrying population and casualties)
+--- and 9{,}737 dependency edges wired by spatial proximity: grid
+interconnects between substations ($k=2$), power feeds to towers, hospitals,
+and zones, communication links to hospitals and zones, and bridge access to
+zones within 1.5~km.
+
+Each of 300 Monte Carlo iterations proceeds in three steps. (1)~Direct
+failures are sampled per infrastructure node from a logistic fragility on
+amplified PGA (median capacities 0.35--0.50~g by node type) plus a
+liquefaction boost. (2)~Failures propagate: a functioning substation fails
+with probability $1-(1-0.30)^{d}$ when $d$ interconnected neighbours are
+down (load redistribution \cite{motter2002}); towers and hospitals fail
+with probability 0.65 and 0.30 respectively when all feeding substations
+are lost \cite{ouyang2014} (backup generation folded into the conditional
+probability; values are literature-informed and perturbed in sensitivity
+analysis). (3)~Zones lose a service when all providers are down, and rescue
+delay multiplies by 1.60 (communication lost), 1.25 (power lost), and 1.50
+(bridge out), composing additively. We use $N = 300$ Monte Carlo iterations
+after a convergence check showing population-weighted delay factor stabilizes
+within $\pm$2\% of the $N = 500$ mean for $N \geq 200$
+(\texttt{scripts/mc\_convergence\_study.py}). The ensemble runs six scenarios
+(four Dauki magnitudes for training, two Madhupur magnitudes for
+generalization testing).
+
+\subsection{Physics-Informed Surrogate Emulator}
+\label{sec:surrogate}
+The cascade Monte Carlo simulation (Section~\ref{sec:cascade}) is the
+authoritative physics model; a \textbf{physics-informed surrogate emulator}
+accelerates it for interactive digital-twin queries. We implement the emulator
+as a two-layer graph neural network trained on Monte Carlo labels. After
+architecture ablation (Section~\ref{sec:sensitivity}), \textbf{GraphSAGE}
+\cite{hamilton2017} is adopted for production inference (lowest test MAE,
+$R^2 = 0.992$); GCN \cite{kipf2017} is retained as the literature-standard
+spectral baseline in the comparison table. The production model uses a
+symmetric normalized adjacency $\hat{A} = D^{-1/2}(A+I)D^{-1/2}$ over the
+1{,}992 infrastructure nodes and predicts each node's \textit{total}
+(direct plus cascaded) failure probability --- not fragility alone.
+Twelve input features comprise node-type one-hot, amplified PGA, liquefaction
+index, in/out degree, direct fragility probability, and scenario magnitude.
+Two training regimes are reported:
+(a)~75/25 node hold-out on the $M_w$~7.2 Dauki graph; and (b)~cross-scenario
+training on four Dauki graphs with evaluation on all nodes from held-out
+Madhupur scenarios. Training uses mean-squared-error loss and the Adam
+optimizer (500 epochs, 32 hidden units for single-scenario; 48 for
+cross-scenario). The comparison baseline is the physics-only direct
+fragility, which cannot represent cascades by construction.
+
+\subsection{Earthquake Resilience Index}
+\label{sec:eri}
+A composite Earthquake Resilience Index (ERI) is computed for each of the
+487 building zones as a weighted sum of four normalized components:
+structural resilience ($1 - \bar{P}_{\mathrm{collapse}}$, weight 0.30),
+emergency-capacity headroom (weight 0.25), lifeline robustness
+(inverse cascade delay factor, weight 0.25), and accessibility
+(inverse normalized response time, weight 0.20). Weights reflect equal
+stakeholder emphasis for exposition; one-at-a-time $\pm$0.10 perturbations
+change citywide ERI by less than 2 points (Section~\ref{sec:sensitivity}).
+Citywide ERI is the population-weighted mean; zones are tiered low ($<$40),
+moderate (40--55), high (55--70), and very high ($\geq$70).
+
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+All analyses were implemented in Python (GeoPandas, NetworkX, PyTorch,
+XGBoost); configuration lives in versioned YAML files and every figure and
+table below is regenerated by a single scripted pipeline (see
+Section~\ref{sec:code_availability}).
+
+\subsection{Hazard and Building Vulnerability}
+Bedrock PGA over the study area is 0.145--0.178~g (mean 0.161~g),
+soil-amplified PGA 0.188--0.252~g (mean 0.224~g), and mean MMI 8.08.
+Figure~\ref{fig:hazard} maps amplified PGA; amplification concentrates in
+the eastern and riverine soft-soil zones.
+
+\casinlinefig[0.9\linewidth]{F5_2_amplified_pga.png}{Soil-amplified peak ground acceleration for the $M_w$~7.2 Dauki scenario.}{fig:hazard}
+
+Of 706{,}115 buildings, mean collapse probability is 0.40 (median 0.40),
+with only 0.33\% exceeding a 0.5 threshold (2{,}323 buildings) under the
+logic-tree GMPE and Vs30 amplification --- most stock falls in the moderate
+band (0.2--0.5). Fragility ordering across construction classes remains
+physically sensible (Table~\ref{tab:construction}, Figures~\ref{fig:collapse}
+and \ref{fig:byclass}): informal construction is most fragile (mean 0.657)
+and engineered reinforced concrete least (0.141). Notably, 95.4\% of buildings
+carry no OSM construction tag and default to the ``unknown'' fragility
+class --- the dominant epistemic uncertainty in the vulnerability layer.
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Collapse probability by construction class ($M_w$~7.2 Dauki).}
+  \label{tab:construction}
+  \small
+  \begin{tabular}{lrr}
+    \toprule
+    Construction class & Buildings & Mean $P_{\mathrm{collapse}}$ \\
+    \midrule
+    Informal            & 176       & 0.657 \\
+    Unknown (untagged)  & 673{,}392 & 0.401 \\
+    Residential (tagged)& 26{,}374  & 0.359 \\
+    Industrial          & 415       & 0.267 \\
+    Institutional       & 890       & 0.223 \\
+    Commercial          & 1{,}553   & 0.200 \\
+    Reinforced concrete & 3{,}315   & 0.141 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\casinlinefig[0.9\linewidth]{F6_1_collapse_probability_map.png}{Building-level collapse probability across Greater Dhaka.}{fig:collapse}
+
+\casinlinefig[0.85\linewidth]{F6_2_collapse_by_construction_type.pdf}{Mean collapse probability by normalized construction class.}{fig:byclass}
+
+\subsection{Diurnal Exposure}
+Under population conservation, total exposure is constant by construction;
+what varies is its location (Table~\ref{tab:diurnal},
+Figure~\ref{fig:diurnal}). Only $\approx$35{,}000 people occupy buildings
+with collapse probability $\geq 0.5$ at any hour under the upgraded hazard
+model; diurnal variation in high-risk exposure is $\approx$1\%. HAZUS-expected
+casualties at midday total 322{,}837 and vary by less than 2\% across the
+day. The flatness reflects both OSM occupancy incompleteness and the fact
+that most buildings now fall below the 0.5 collapse threshold.
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Diurnal exposure ($M_w$~7.2 Dauki; population-conserving).}
+  \label{tab:diurnal}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lrrr}
+    \toprule
+    Period & Population & High-risk bldgs & Expected casualties \\
+    \midrule
+    00:00 midnight & 4{,}475{,}588 & 35{,}038 & 328{,}634 \\
+    08:00 commute  & 4{,}586{,}032 & 35{,}093 & 326{,}843 \\
+    13:00 midday   & 4{,}593{,}956 & 35{,}210 & 322{,}837 \\
+    18:00 evening  & 4{,}542{,}278 & 34{,}903 & 327{,}568 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\casinlinefig[\linewidth]{F7_1_diurnal_population_casualties.pdf}{High-risk exposure and expected severe impacts by time of day.}{fig:diurnal}
+
+\subsection{Emergency Response}
+At midday, HAZUS-expected casualty demand (322{,}837) exceeds the
+estimated emergency capacity of 243 of 728 mapped health facilities (33\%),
+with the worst-affected facility receiving 38$\times$ its proxy capacity;
+the mean response-time proxy is 7.2 minutes (network-routed where connected).
+Rescue priority (Figure~\ref{fig:rescue}) concentrates on large-footprint,
+high-occupancy structures rather than the single most fragile buildings,
+reflecting the casualty-weighted score.
+
+\casinlinefig[0.85\linewidth]{F8_2_rescue_priority_map.png}{Building-level rescue priority (midday scenario).}{fig:rescue}
+
+\subsection{Cascading Lifeline Failure}
+Cascades transform the lifeline picture (Table~\ref{tab:cascade},
+Figure~\ref{fig:cascade}). Direct seismic fragility alone predicts mean
+failure probabilities of 0.07--0.14 across node types; with grid
+interdependency, substation failure rises to 0.600 (4.3$\times$),
+communication-tower loss to 0.766 (6.0$\times$), and hospital functional
+loss to 0.604 (7.1$\times$). Bridges, which depend on nothing upstream, are
+unchanged --- a useful internal control. Population-weighted, residents face
+a 67\% probability of power loss and 65\% of bridge-access disruption, and
+the expected rescue-delay factor is 1.90 (95\% CI 1.88--1.93 across MC
+iterations at $N = 300$).
+
+The six-scenario ensemble reveals that \textbf{fault proximity dominates
+magnitude}: a $M_w$~7.0 Madhupur rupture (closer to Dhaka) produces
+near-total lifeline failure (100\% communication loss, delay factor 2.34)
+whereas a $M_w$~7.2 Dauki event yields 68\% communication loss and delay
+1.90 (Table~\ref{tab:ensemble}).
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Population-weighted cascade impact by scenario (300 MC iterations).}
+  \label{tab:ensemble}
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lccc}
+    \toprule
+    Scenario & $P$(power lost) & $P$(comm.\ lost) & Delay factor \\
+    \midrule
+    $M_w$~6.8 Dauki   & 0.47 & 0.47 & 1.65$\times$ \\
+    $M_w$~7.0 Dauki   & 0.59 & 0.58 & 1.78$\times$ \\
+    $M_w$~7.2 Dauki   & 0.67 & 0.68 & 1.90$\times$ \\
+    $M_w$~7.5 Dauki   & 0.83 & 0.85 & 2.09$\times$ \\
+    $M_w$~6.5 Madhupur & 0.98 & 0.99 & 2.31$\times$ \\
+    $M_w$~7.0 Madhupur & 1.00 & 1.00 & 2.34$\times$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Mean failure probability by node type ($M_w$~7.2 Dauki; 300 MC iterations).}
+  \label{tab:cascade}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lccc}
+    \toprule
+    Node type & Direct & Total (cascade) & Amplification \\
+    \midrule
+    Power (61)       & 0.139 & 0.600 & 4.3$\times$ \\
+    Comm.\ tower (8) & 0.127 & 0.766 & 6.0$\times$ \\
+    Hospital (728)   & 0.085 & 0.604 & 7.1$\times$ \\
+    Bridge (1{,}195) & 0.069 & 0.068 & 1.0$\times$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\casinlinefig[0.85\linewidth]{F9_1_cascade_amplification.pdf}{Cascade amplification of failure probability by node type.}{fig:cascade}
+
+\subsection{Surrogate Emulator Performance}
+\label{sec:surrogate_results}
+The physics-informed surrogate emulator is evaluated against its Monte Carlo
+training labels. On a 75/25 node hold-out of the $M_w$~7.2 Dauki graph, the
+production GraphSAGE emulator
+predicts total failure probability with mean absolute error 0.016 and
+$R^2 = 0.992$ (Figure~\ref{fig:gnn}); the physics-only baseline achieves
+mean absolute error 0.231 and $R^2 = -0.55$. Cross-scenario training on
+four Dauki graphs and evaluation on held-out Madhupur scenarios yields
+$R^2 = 0.883$ (MAE 0.078) versus a direct-fragility baseline of
+$R^2 = 0.305$ (Table~\ref{tab:gnn}), confirming transferable cascade
+structure rather than single-graph memorization. Inference over the full
+graph takes milliseconds, versus minutes for Monte Carlo simulation.
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Surrogate emulator quality: single-scenario node hold-out vs.\ cross-scenario generalization.}
+  \label{tab:gnn}
+  \small
+  \begin{tabular}{lcc}
+    \toprule
+    Model & MAE & $R^2$ \\
+    \midrule
+    GraphSAGE ($M_w$~7.2 node hold-out)     & 0.016 & 0.992 \\
+    GraphSAGE (held-out Madhupur scenarios) & 0.078 & 0.883 \\
+    Direct fragility (Madhupur test)  & 0.117 & 0.305 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\casinlinefig[0.75\linewidth]{F9_4_gnn_vs_montecarlo.pdf}{Physics-informed surrogate emulator versus Monte Carlo total failure probability on held-out nodes.}{fig:gnn}
+
+\subsection{Earthquake Resilience Index}
+Citywide ERI is 70.9 (very-high tier; mean zone ERI 69.4). Of 487 zones,
+252 fall in the very-high tier ($\geq$70) and 235 in the high tier (55--70).
+Component scores (0--1, higher = more resilient) are structural 0.60,
+emergency capacity 0.86, lifeline robustness 0.61, and accessibility 0.81.
+Lifeline and structural components are the binding constraints under the
+reference scenario; emergency-capacity headroom is higher once HAZUS
+severity rates replace the earlier flat casualty proxy. Manual YAML weights
+(0.30/0.25/0.25/0.20) are compared with an entropy--hybrid scheme that
+assigns data-driven weights to spatially varying components and retains the
+manual emergency weight where zonal hospital load is uniform; citywide ERI
+shifts from 70.9 to 76.1 under the hybrid scheme (Section~\ref{sec:sensitivity}).
+
+\subsection{External Validation}
+\label{sec:external_validation}
+Internal checks (literature PGA/MMI envelopes at 158~km) are supplemented by
+distance--magnitude envelope tests and a historical analog replay
+(\texttt{scripts/run\_external\_validation.py}). At 150~km and $M_w$~7.2 the
+logic-tree bedrock PGA (0.169~g) falls within the CDMP-style
+0.06--0.18~g envelope used for Dhaka scenario classes; at 100~km and
+200~km the model sits at the upper and lower bounds respectively, reflecting
+GMPE conservatism at short range and attenuation at long range. Replaying the
+1897 Great Assam earthquake ($M_w \approx 8.1$, 250~km from Dhaka) yields
+model MMI 8.3 versus macroseismic reports of VI--VII ($\approx$6.5--7.5 MMI)
+\cite{oldham1899} --- the GMPE replay \textit{overpredicts} shaking, so it is
+used as an order-of-magnitude consistency check, not damage calibration.
+ShakeMap raster comparison, observed hospital disruption, and utility outage
+validation are not yet possible with open Bangladesh feeds; these remain the
+principal external-validation gaps (Section~\ref{sec:limitations}).
+
+\subsection{Sensitivity Analysis and Uncertainty}
+\label{sec:sensitivity}
+Because many sub-models rely on open-data proxies, we report targeted
+one-at-a-time sensitivity studies (scripts in \texttt{scripts/run\_sensitivity\_studies.py},
+\texttt{scripts/gnn\_architecture\_ablation.py},
+\texttt{scripts/mc\_convergence\_study.py}) rather than only point estimates.
+(i)~\textbf{GMPE logic-tree weights:} 40/60 and 60/40 branch splits change
+mean amplified PGA by $\leq$3.6\%. (ii)~\textbf{Occupancy multipliers:}
+$\pm$20\% on non-residential classes (residential fixed, totals conserved)
+changes midday casualties by 0.9\%. (iii)~\textbf{Cascade conditional
+probabilities:} $\pm$0.15 perturbations change the citywide delay factor by
+up to 11.8\% (substation overload rate most influential). (iv)~\textbf{ERI
+weights:} $\pm$0.10 one-at-a-time perturbations change citywide ERI by
+$\leq$1.7 points. (v)~\textbf{Monte Carlo count:} population-weighted delay
+factor varies by $<$1.2\% between $N = 50$ and $N = 500$; $N = 300$ differs
+from $N = 500$ by 0.4\%. (vi)~\textbf{Surrogate architecture:} GraphSAGE is
+adopted for production inference (lowest test MAE 0.016, $R^2 = 0.992$); GCN,
+GAT, and MLP are within 0.004 MAE; topology-free MLP underperforms graph models
+(Table~\ref{tab:gnn_ablation}). (vii)~\textbf{Vs30:} $\pm$20\% perturbation
+changes mean $P_{\mathrm{collapse}}$ by up to 8.6\%. (viii)~\textbf{ERI
+weighting:} entropy--hybrid weights (spatially varying components only) shift
+citywide ERI by 5.2 points versus manual weights (70.9 vs.\ 76.1).
+
+\textbf{Latin Hypercube uncertainty propagation} ($N = 128$; six parameters:
+GMPE weight, fragility median shift, logistic slope, cascade conditional
+probabilities, non-residential occupancy) jointly samples epistemic uncertainty
+(\texttt{scripts/run\_latin\_hypercube\_uq.py}). Table~\ref{tab:uq_ci}
+reports 95\% intervals on citywide metrics; casualties and mean collapse
+probability vary substantially under coupled perturbations, whereas
+one-at-a-time tests suggested smaller marginal effects.
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Latin Hypercube 95\% confidence intervals ($N = 128$; $M_w$~7.2 Dauki midday).}
+  \label{tab:uq_ci}
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lcc}
+    \toprule
+    Metric & Mean & 95\% CI \\
+    \midrule
+    Mean $P_{\mathrm{collapse}}$ & 0.41 & 0.33--0.47 \\
+    Midday casualties (millions) & 0.32 & 0.19--0.41 \\
+    Cascade delay factor & 1.90 & 1.60--2.22 \\
+    Citywide ERI & 69.1 & 64.0--75.2 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[pos=htbp]
+  \centering
+  \caption{Surrogate emulator architecture ablation (75/25 node hold-out; $M_w$~7.2 Dauki).}
+  \label{tab:gnn_ablation}
+  \small
+  \begin{tabular}{lcc}
+    \toprule
+    Architecture & MAE & $R^2$ \\
+    \midrule
+    GraphSAGE       & 0.016 & 0.992 \\
+    GAT (gated blend) & 0.017 & 0.991 \\
+    GCN             & 0.018 & 0.988 \\
+    MLP (no graph)  & 0.022 & 0.976 \\
+    GIN             & 0.052 & 0.950 \\
+    Direct fragility & 0.222 & $-0.56$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Discussion}
+Compared with ward-level Dhaka assessments \cite{cdmp2009,islam2020}, our
+bedrock PGA (mean 0.161~g) sits within the CDMP envelope for a large eastern
+fault event at 150--200~km, while building-resolved fragility exposes
+moderate-band dominance (mean $P_{\mathrm{collapse}} = 0.40$) rather than
+the binary high/low splits typical of index-based studies. HAZUS-expected
+casualties ($\approx$0.32~M at midday) are planning-order estimates --- lower
+than naive 35\% flat-rate proxies but not directly comparable to historical
+fatality counts from distant analogues (e.g., 1897 Assam) without event
+matching. Relative to OpenQuake/GEM portfolio tools \cite{pagani2014,gem2023},
+QuakeTwin's contribution is the \textit{coupled} city-scale chain from OSM
+footprints through diurnal exposure, routing, cascade, and surrogate emulation.
+
+Three findings carry direct policy weight. First, the vulnerability layer is
+dominated by untagged, presumably non-engineered stock in the eastern and
+riverine soft-soil zones where amplification and liquefaction coincide ---
+the same neighbourhoods that rank worst on cascade-driven rescue delay.
+Retrofitting and code-enforcement effort should be prioritized there, and a
+structural tagging campaign (even a coarse engineered/non-engineered
+dichotomy) would collapse the largest single uncertainty in this study.
+
+Second, HAZUS-expected casualty demand exceeding one-third of mapped
+emergency capacity implies that nearest-hospital routing is not a viable
+response doctrine for this scenario class; pre-planned casualty distribution
+and field-hospital pre-positioning are required.
+
+Third, the 4--7$\times$ cascade amplification of lifeline failure means
+hardening a small number of substations and guaranteeing hospital backup
+power buys disproportionate system resilience --- these are cheaper
+interventions than structural retrofitting at scale, and the dependency
+graph identifies exactly which nodes matter most. The Madhupur ensemble
+shows that fault proximity can matter more than magnitude: planners must
+stress-test multiple epicenters, not a single reference rupture.
+
+The cross-scenario surrogate emulator ($R^2 = 0.883$ on held-out Madhupur graphs) converts
+minutes-scale Monte Carlo simulation into a milliseconds-scale function with modest
+accuracy loss relative to single-scenario training ($R^2 = 0.992$). This
+trade-off is acceptable for interactive epicenter sweeps in the digital twin.
+Architecturally, QuakeTwin separates \textit{state} (building and infrastructure
+graphs), \textit{simulation} (hazard, fragility, cascade Monte Carlo), and
+\textit{surrogate inference} (graph-based emulator), enabling a future Phase~6 dashboard where
+seismic feeds or hospital status updates trigger re-evaluation in milliseconds
+via the surrogate while retaining the physics pipeline for calibration runs.
+
+\section{Limitations}
+\label{sec:limitations}
+All quantitative claims are conditional on open-data completeness and stated
+assumptions. First, 95\% of buildings lack OSM construction and occupancy
+tags, defaulting to class medians; the diurnal flatness partly reflects this
+incompleteness. Second, soil zones combine Vs30 sampling with
+literature-informed proxies pending borehole validation. Third, network
+shortest-path routing connects only 5.9\% of buildings to hospitals in the
+current road graph; most assignments still use straight-line fallbacks.
+Fourth, hospital capacities derive from amenity tags. Fifth, only eight
+communication towers are mapped, dependency wiring is proximity-based rather
+than actual feeder or backhaul topology, and conditional failure
+probabilities are literature-informed assumptions. Sixth, cross-scenario surrogate
+$R^2$ (0.883) is lower than single-scenario performance (0.992) --- both
+should be reported. Seventh, external validation is limited to literature
+PGA/MMI envelopes and a qualitative 1897 Assam replay; there is no ShakeMap
+raster comparison, post-event damage survey, or observed hospital/utility
+outage calibration. The pipeline is designed so that each proxy can be
+swapped for authoritative data (borehole logs, DPDC/DESCO feeders, DGHS bed
+censuses) without structural change.
+
+\section{Conclusion}
+QuakeTwin demonstrates that a building-resolved, temporally dynamic,
+cascade-aware earthquake digital twin of a data-scarce megacity can be
+assembled entirely from open data and open source. For a $M_w$~7.2 Dauki
+scenario, the twin estimates mean collapse probability 0.40 (0.33\% of
+buildings exceed 0.5), HAZUS-expected casualties of roughly 0.32~million
+at midday with less than 2\% diurnal variation, casualty demand overwhelming
+one-third of mapped health-facility capacity, and cascading lifeline failure
+--- invisible to direct fragility analysis --- raising expected rescue delay
+by a factor of 1.90 (95\% CI 1.60--2.22 under Latin Hypercube propagation).
+A nearer Madhupur rupture produces worse lifeline
+outcomes despite lower magnitude. Latin Hypercube analysis yields 95\% CIs of
+0.33--0.47 on mean collapse probability and 0.19--0.41~million on midday
+casualties under jointly sampled epistemic uncertainty.
+
+Principal findings include: (i) GMPE logic-tree and Vs30 amplification yield
+defensible moderate-band fragility even under heavy tag incompleteness;
+(ii) population conservation is essential for defensible diurnal exposure
+claims; (iii) direct fragility understates lifeline failure by 4--7$\times$
+once grid interdependency is modelled; (iv) fault proximity can dominate
+magnitude in cascade outcomes; (v) physics-informed surrogate emulators generalize
+across scenarios with $R^2 = 0.883$ at millisecond latency; and (vi) the composite ERI (70.9
+citywide) localizes where structural and lifeline interventions matter most.
+Future work extends the twin with a CesiumJS three-dimensional front end,
+full road-graph connectivity for routing, Open Buildings height integration,
+and authoritative utility and geotechnical data as they become available.
+
+\declarationspage
+
+\bibliography{cas-refs}
+
+\end{document}

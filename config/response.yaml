@@ -1,0 +1,38 @@
+# Phase 4 — emergency response assumptions
+
+default_period: "midday"
+
+hospital_capacity:
+  default_beds: 150
+  bed_to_emergency_capacity_factor: 1.4
+  min_capacity: 40
+  max_capacity: 1200
+  amenity_capacity:
+    hospital: 300
+    clinic: 80
+  healthcare_capacity:
+    hospital: 300
+    clinic: 80
+
+road_access:
+  speed_kmh:
+    motorway: 45
+    trunk: 38
+    primary: 30
+    secondary: 24
+    tertiary: 20
+    residential: 14
+    unclassified: 12
+    service: 10
+    living_street: 8
+    path: 4
+    footway: 4
+  blockage_distance_m: 25
+  blockage_delay_minutes_per_nearby_high_risk_building: 2.0
+  max_blockage_delay_minutes: 90
+
+rescue_priority:
+  casualty_weight: 0.65
+  collapse_weight: 0.20
+  access_weight: 0.15
+  severe_collapse_threshold: 0.75

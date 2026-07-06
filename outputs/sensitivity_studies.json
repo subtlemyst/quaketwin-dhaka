@@ -1,0 +1,143 @@
+{
+  "gmpe_weights": {
+    "center_distance_km": 156.9,
+    "baseline_pga_g": 0.1607,
+    "rows": [
+      {
+        "w_boore": 0.55,
+        "w_ab2006": 0.45,
+        "bedrock_pga_g": 0.1607,
+        "pct_change_vs_55_45": 0.0,
+        "est_mean_amplified_pga_g": 0.219,
+        "est_amplified_pct_change": 0.0
+      },
+      {
+        "w_boore": 0.5,
+        "w_ab2006": 0.5,
+        "bedrock_pga_g": 0.1626,
+        "pct_change_vs_55_45": 1.2,
+        "est_mean_amplified_pga_g": 0.2216,
+        "est_amplified_pct_change": 1.2
+      },
+      {
+        "w_boore": 0.45,
+        "w_ab2006": 0.55,
+        "bedrock_pga_g": 0.1645,
+        "pct_change_vs_55_45": 2.39,
+        "est_mean_amplified_pga_g": 0.2242,
+        "est_amplified_pct_change": 2.39
+      },
+      {
+        "w_boore": 0.4,
+        "w_ab2006": 0.6,
+        "bedrock_pga_g": 0.1664,
+        "pct_change_vs_55_45": 3.59,
+        "est_mean_amplified_pga_g": 0.2268,
+        "est_amplified_pct_change": 3.59
+      },
+      {
+        "w_boore": 0.6,
+        "w_ab2006": 0.4,
+        "bedrock_pga_g": 0.1587,
+        "pct_change_vs_55_45": 1.2,
+        "est_mean_amplified_pga_g": 0.2164,
+        "est_amplified_pct_change": 1.2
+      }
+    ],
+    "max_amplified_pct_change": 3.59
+  },
+  "occupancy_multipliers": {
+    "period": "midday",
+    "scale": 0.2,
+    "note": "Non-residential occupancy multipliers scaled; residential fixed; citywide total conserved.",
+    "baseline_casualties": 315961,
+    "low_scale_casualties": 318660,
+    "high_scale_casualties": 313126,
+    "max_pct_change": 0.9
+  },
+  "eri_weights": {
+    "baseline_eri": 70.9,
+    "delta": 0.1,
+    "max_abs_change": 1.7,
+    "rows": [
+      {
+        "component": "structural",
+        "perturbation": "+0.1",
+        "citywide_eri": 69.9
+      },
+      {
+        "component": "structural",
+        "perturbation": "-0.1",
+        "citywide_eri": 72.0
+      },
+      {
+        "component": "emergency_capacity",
+        "perturbation": "+0.1",
+        "citywide_eri": 72.2
+      },
+      {
+        "component": "emergency_capacity",
+        "perturbation": "-0.1",
+        "citywide_eri": 69.2
+      },
+      {
+        "component": "lifeline_robustness",
+        "perturbation": "+0.1",
+        "citywide_eri": 70.0
+      },
+      {
+        "component": "lifeline_robustness",
+        "perturbation": "-0.1",
+        "citywide_eri": 72.0
+      },
+      {
+        "component": "accessibility",
+        "perturbation": "+0.1",
+        "citywide_eri": 71.8
+      },
+      {
+        "component": "accessibility",
+        "perturbation": "-0.1",
+        "citywide_eri": 69.8
+      }
+    ]
+  },
+  "cascade_propagation": {
+    "baseline_delay_factor": 1.9147,
+    "n_iterations": 100,
+    "delta": 0.15,
+    "max_pct_change": 11.75,
+    "rows": [
+      {
+        "parameter": "substation_to_substation",
+        "value": 0.45,
+        "delay_factor": 2.0379
+      },
+      {
+        "parameter": "substation_to_substation",
+        "value": 0.15,
+        "delay_factor": 1.6897
+      },
+      {
+        "parameter": "substation_to_tower",
+        "value": 0.8,
+        "delay_factor": 1.934
+      },
+      {
+        "parameter": "substation_to_tower",
+        "value": 0.5,
+        "delay_factor": 1.8675
+      },
+      {
+        "parameter": "substation_to_hospital",
+        "value": 0.45,
+        "delay_factor": 1.9083
+      },
+      {
+        "parameter": "substation_to_hospital",
+        "value": 0.15,
+        "delay_factor": 1.9384
+      }
+    ]
+  }
+}
