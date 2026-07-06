@@ -162,8 +162,8 @@ Mw 7.2 Dauki event, despite lower magnitude.
 
 | Model | Split | MAE | R² |
 |---|---|---|---|
-| Single-scenario GCN (Mw 7.2 Dauki) | 75/25 node hold-out | 0.017 | 0.991 |
-| **Cross-scenario GCN** | Held-out Madhupur scenarios | **0.078** | **0.883** |
+| **Production GraphSAGE** (Mw 7.2 Dauki) | 75/25 node hold-out | 0.016 | 0.993 |
+| **Cross-scenario GraphSAGE** | Held-out Madhupur scenarios | **0.078** | **0.883** |
 | Direct fragility baseline | Held-out Madhupur | 0.117 | 0.305 |
 
 Cross-scenario generalization (R² = 0.883) confirms the surrogate learns
@@ -231,7 +231,7 @@ Architecture figure: `paper/figures/dt_architecture.pdf`.
 - Open Buildings height merge optional; OSM `building:levels` defaults dominate.
 - Eight communication towers mapped in OSM; cascade comm layer is indicative.
 - Dependency wiring is proximity-based, not actual utility topology.
-- Cross-scenario surrogate emulator R² (0.883) is lower than single-scenario (0.991) — report
+- Cross-scenario surrogate emulator R² (0.883) is lower than single-scenario GraphSAGE (0.993) — report
   both to show generalization vs overfitting trade-off.
 - External validation limited to literature envelopes and 1897 analog; no ShakeMap,
   post-event damage survey, or observed hospital/utility outage data.

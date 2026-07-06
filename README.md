@@ -1,8 +1,11 @@
 # QuakeTwin Dhaka
 
-**A graph-neural-network digital twin of earthquake vulnerability, dynamic population exposure, and cascading lifeline failure in Dhaka, Bangladesh**
+**An open earthquake digital twin of vulnerability, dynamic population exposure, and cascading lifeline failure in Greater Dhaka, Bangladesh**
 
-Open, reproducible pipeline (Phases 0–5) with quality upgrades: GMPE logic-tree, Vs30 amplification, HAZUS casualties, network routing, multi-scenario cascade ensemble, physics-informed surrogate emulator, and Earthquake Resilience Index.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-subtlemyst%2Fquaketwin--dhaka-181717?logo=github)](https://github.com/subtlemyst/quaketwin-dhaka)
+
+Open, reproducible pipeline (Phases 0–5) with quality upgrades: GMPE logic-tree, Vs30 amplification, HAZUS casualties, network routing, multi-scenario cascade ensemble, **GraphSAGE physics-informed surrogate emulator**, and Earthquake Resilience Index.
 
 **Manuscript:** `paper/main.tex` (Elsevier CAS `cas-sc`)  
 **Results:** `docs/results_summary.md`  
@@ -32,7 +35,7 @@ Open, reproducible pipeline (Phases 0–5) with quality upgrades: GMPE logic-tre
 | Exposure | 322,837 HAZUS-expected casualties; ~35k in high-risk buildings |
 | Response | 243/728 hospitals overloaded; 7.2 min mean response time |
 | Cascade | 4–7× lifeline amplification; 1.90× rescue-delay factor |
-| Surrogate emulator | R² = 0.991 (single scenario); R² = 0.883 (cross-scenario) |
+| Surrogate emulator (GraphSAGE) | R² = 0.993 (single scenario); R² = 0.883 (cross-scenario) |
 | ERI | Citywide 70.9 (very-high tier) |
 
 See `docs/results_summary.md` for full tables and ensemble (Dauki vs Madhupur).
@@ -164,4 +167,4 @@ Document software version and data sources (OSM, WorldPop, USGS Vs30, regional h
 
 ## License
 
-Academic / thesis use — add your institution's license as needed.
+Released under the [MIT License](LICENSE) (Copyright © 2026 Md. Rafiul Azam Chowdhury).

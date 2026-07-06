@@ -5,9 +5,22 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "quaketwin-dhaka"
 version = "0.1.0"
-description = "AI-powered digital twin for earthquake vulnerability in Dhaka (thesis scaffold)"
+description = "Open earthquake digital twin for Greater Dhaka — hazard, exposure, cascade, GraphSAGE surrogate"
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.11"
+keywords = [
+    "earthquake",
+    "digital-twin",
+    "dhaka",
+    "bangladesh",
+    "openstreetmap",
+    "disaster-risk",
+    "cascading-failure",
+    "graph-neural-network",
+    "seismic-hazard",
+    "urban-resilience",
+]
 dependencies = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
